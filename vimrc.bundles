@@ -1,0 +1,22 @@
+
+
+
+
+
+filetype off
+	set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+
+"vim-scripts
+Bundle 'taglist.vim'
+Bundle 'peaksea'
+Bundle 'Lucius'
+Bundle 'VimClojure'
+Bundle 'c.vim'
+Bundle 'a.vim'
+
+
+
+"github other 
+Bundle 'scrooloose/nerdtree'

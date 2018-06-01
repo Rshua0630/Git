@@ -1,0 +1,31 @@
+
+
+
+"Joshua begin 
+
+
+"show line number
+set number
+
+"c / c++ autoindent
+set autoindent
+set cindent
+
+"
+syntax enable
+syntax on
+
+"tab size 
+set tabstop=2
+set shiftwidth=2
+
+"code mothod
+set encoding=utf-8
+
+
+"backup history line
+set history=1000
+
+"Joshua end
+
+11111111111
