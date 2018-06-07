@@ -1,100 +1,76 @@
-" All system-wide defaults are set in $VIMRUNTIME/debian.vim and sourced by
-" the call to :runtime you can find below.  If you wish to change any of those
-" settings, you should do it in this file (/etc/vim/vimrc), since debian.vim
-" will be overwritten everytime an upgrade of the vim packages is performed.
-" It is recommended to make changes after sourcing debian.vim since it alters
-" the value of the 'compatible' option.
-
-" This line should not be removed as it ensures that various options are
-" properly set to work with the Vim-related packages available in Debian.
-runtime! debian.vim
-
-" Uncomment the next line to make Vim more Vi-compatible
-" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
-" options, so any other options should be set AFTER setting 'compatible'.
-"set compatible
-
-" Vim5 and later versions support syntax highlighting. Uncommenting the next
-" line enables syntax highlighting by default.
-if has("syntax")
-  syntax on
-endif
-
-" If using a dark background within the editing area and syntax highlighting
-" turn on this option as well
-"set background=dark
-
-" Uncomment the following to have Vim jump to the last position when
-" reopening a file
-"if has("autocmd")
-"  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-"endif
-
-" Uncomment the following to have Vim load indentation rules and plugins
-" according to the detected filetype.
-"if has("autocmd")
-"  filetype plugin indent on
-"endif
-
-" The following are commented out as they cause vim to behave a lot
-" differently from regular Vi. They are highly recommended though.
-"set showcmd		" Show (partial) command in status line.
-"set showmatch		" Show matching brackets.
-"set ignorecase		" Do case insensitive matching
-"set smartcase		" Do smart case matching
-"set incsearch		" Incremental search
-"set autowrite		" Automatically save before commands like :next and :make
-"set hidden		" Hide buffers when they are abandoned
-"set mouse=a		" Enable mouse usage (all modes)
+" Setting some decent VIM settings for programming
 
 
-
-" Source a global configuration file if available
-if filereadable("/etc/vim/vimrc.local")
-  source /etc/vim/vimrc.local
-endif
-
-if filereadable("/etc/vim/vimrc.bundles")
-  source /etc/vim/vimrc.bundles
-endif
-
-if filereadable("/etc/vim/vimrc/keymap")
-	source /etc/vim/vimrc.keymap
-endif	
-
-set number
-syntax on
-filetype on
+set ai                          " set auto-indenting on for programming
+set showmatch                   " automatically show matching brackets. works like it does in bbedit.
+set vb                          " turn on the "visual bell" - which is much quieter than the "audio blink"
+set ruler                       " show the cursor position all the time
+set laststatus=2                " make the last line where the status is two lines deep so you can see status always
+set backspace=indent,eol,start  " make that backspace key work the way it should
+set nocompatible                " vi compatible is LAME
+filetype on			" filetype
 filetype indent on
-filetype plugin on 
+filetype plugin on
 filetype plugin indent on
-set nocp 			"close vi mode
-set history=1000
-set hlsearch
-set incsearch
-set smartindent
-set cindent
-set tabstop=2
+set showmode                    " show the current mode
+set clipboard=unnamed           " set clipboard to unnamed to access the system clipboard under windows
+syntax on                       " turn syntax highlighting on by default
+set number 			" display line number
+" Show EOL type and last modified timestamp, right after the filename
+set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 
+"------------------------------------------------------------------------------
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+    "Set UTF-8 as the default encoding for commit messages
+    autocmd BufReadPre COMMIT_EDITMSG,MERGE_MSG,git-rebase-todo setlocal fileencodings=utf-8
+
+    "Remember the positions in files with some git-specific exceptions"
+    autocmd BufReadPost *
+      \ if line("'\"") > 0 && line("'\"") <= line("$")
+      \           && expand("%") !~ "COMMIT_EDITMSG"
+      \           && expand("%") !~ "MERGE_EDITMSG"
+      \           && expand("%") !~ "ADD_EDIT.patch"
+      \           && expand("%") !~ "addp-hunk-edit.diff"
+      \           && expand("%") !~ "git-rebase-todo" |
+      \   exe "normal g`\"" |
+      \ endif
+
+      autocmd BufNewFile,BufRead *.patch set filetype=diff
+      autocmd BufNewFile,BufRead *.diff set filetype=diff
+
+      autocmd Syntax diff
+      \ highlight WhiteSpaceEOL ctermbg=red |
+      \ match WhiteSpaceEOL /\(^+.*\)\@<=\s\+$/
+
+      autocmd Syntax gitcommit setlocal textwidth=74
+endif " has("autocmd")
+
+
+"Joshua set scheme & color begin 
+if filereadable("/etc/vimrc.bundles")
+	source /etc/vimrc.bundles
+endif
+
+"autocmd VimEnter * NERDTree
 
 let vimclojure#WantNailgun=1
 
-
-"Joshua set scheme
 if !has("gui_running")
-  set t_Co=256
+	set t_Co=256
 endif
 
-"set background color
-set background=dark
-"colorscheme peaksea
-
+set background=dark             " Use colours that work well on a dark background (Console is usually black)
 colorscheme lucius
 LuciusBlack
+"Joshua set scheme & color end
 
-
+"Joshua set key mapping begin
 nnoremap <F6> :TlistToggle<CR>
 nnoremap <F7> :NERDTreeToggle<CR>
+nnoremap <F8> :CtrlP<CR>
 map NF :NERDTreeFocus<CR>
-map <F12> a<C-R>=strftime("%c")<CR><Esc>
+map <F12> a<C-R>=strftime("%c")<CR><ESC>
+map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
 
